@@ -1,98 +1,72 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const uploadArea = document.getElementById('uploadArea');
-    const imageInput = document.getElementById('imageInput');
-    const originalImage = document.getElementById('originalImage');
-    const compressedImage = document.getElementById('compressedImage');
-    const originalSize = document.getElementById('originalSize');
-    const compressedSize = document.getElementById('compressedSize');
-    const qualitySlider = document.getElementById('quality');
-    const qualityValue = document.getElementById('qualityValue');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const comparisonSection = document.getElementById('comparisonSection');
-    const controls = document.getElementById('controls');
+document.addEventListener('DOMContentLoaded', function () {
+    const productNameInput = document.getElementById('productName');
+    const sellingPointsInput = document.getElementById('sellingPoints');
+    const priceInput = document.getElementById('price');
+    const generateBtn = document.getElementById('generateBtn');
 
-    // 处理文件上传
-    uploadArea.addEventListener('click', () => imageInput.click());
-    uploadArea.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadArea.style.borderColor = '#007AFF';
-    });
-    uploadArea.addEventListener('dragleave', () => {
-        uploadArea.style.borderColor = '#ddd';
-    });
-    uploadArea.addEventListener('drop', (e) => {
-        e.preventDefault();
-        uploadArea.style.borderColor = '#ddd';
-        const file = e.dataTransfer.files[0];
-        if (file && file.type.startsWith('image/')) {
-            handleImage(file);
-        }
-    });
+    const posterProduct = document.getElementById('posterProduct');
+    const posterCopy = document.getElementById('posterCopy');
+    const posterPrice = document.getElementById('posterPrice');
 
-    imageInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            handleImage(file);
-        }
-    });
+    const copyBtn = document.getElementById('copyBtn');
+    const copyFeedback = document.getElementById('copyFeedback');
 
-    // 处理图片压缩
-    function handleImage(file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            originalImage.src = e.target.result;
-            originalSize.textContent = formatFileSize(file.size);
-            compressImage(e.target.result, qualitySlider.value / 100);
-            comparisonSection.style.display = 'flex';
-            controls.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
+    function splitSellingPoints(rawText) {
+        return rawText
+            .split(/[，,、;；\n]/)
+            .map((item) => item.trim())
+            .filter(Boolean);
     }
 
-    function compressImage(base64, quality) {
-        const img = new Image();
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
-            
-            const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
-            compressedImage.src = compressedBase64;
-            
-            // 计算压缩后的大小
-            const compressedBytes = atob(compressedBase64.split(',')[1]).length;
-            compressedSize.textContent = formatFileSize(compressedBytes);
-        };
-        img.src = base64;
+    function generateCopy(productName, sellingPoints, price) {
+        const opening = `还在犹豫选什么？今天给大家推荐一款我最近超爱的「${productName}」！`;
+
+        const pointsLine = sellingPoints.length > 0
+            ? `\n\n它最打动我的地方是：${sellingPoints.map((point) => `✅ ${point}`).join('；')}。`
+            : '\n\n它的体验真的很在线，细节很加分。';
+
+        const priceLine = `\n\n现在到手价 ${price}，性价比真的很高，想入手的朋友可以冲一波～`;
+        const ending = '\n\n适合自用，也很适合送朋友，评论区欢迎来问我真实感受👇';
+
+        return `${opening}${pointsLine}${priceLine}${ending}`;
     }
 
-    // 质量滑块控制
-    qualitySlider.addEventListener('input', (e) => {
-        const quality = e.target.value;
-        qualityValue.textContent = quality + '%';
-        if (originalImage.src) {
-            compressImage(originalImage.src, quality / 100);
-        }
-    });
-
-    // 下载按钮
-    downloadBtn.addEventListener('click', () => {
-        if (compressedImage.src) {
-            const link = document.createElement('a');
-            link.download = 'compressed-image.jpg';
-            link.href = compressedImage.src;
-            link.click();
-        }
-    });
-
-    // 文件大小格式化
-    function formatFileSize(bytes) {
-        if (bytes === 0) return '0 Bytes';
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    function getNormalizedPrice(price) {
+        const cleanPrice = price.trim();
+        if (!cleanPrice) return '¥ --';
+        return cleanPrice.startsWith('¥') ? cleanPrice : `¥ ${cleanPrice}`;
     }
-}); 
+
+    generateBtn.addEventListener('click', function () {
+        const productName = productNameInput.value.trim();
+        const sellingPoints = splitSellingPoints(sellingPointsInput.value);
+        const price = priceInput.value.trim();
+
+        if (!productName || !price) {
+            copyFeedback.textContent = '请先填写产品名和价格。';
+            return;
+        }
+
+        const generatedCopy = generateCopy(productName, sellingPoints, price);
+
+        posterProduct.textContent = productName;
+        posterCopy.textContent = generatedCopy;
+        posterPrice.textContent = getNormalizedPrice(price);
+        copyFeedback.textContent = '文案已生成，可直接复制。';
+    });
+
+    copyBtn.addEventListener('click', async function () {
+        const text = posterCopy.textContent;
+        if (!text || text.includes('填写左侧信息后')) {
+            copyFeedback.textContent = '请先生成文案再复制。';
+            return;
+        }
+
+        try {
+            await navigator.clipboard.writeText(text);
+            copyFeedback.textContent = '已复制到剪贴板。';
+        } catch (error) {
+            copyFeedback.textContent = '复制失败，请手动复制。';
+        }
+    });
+});
