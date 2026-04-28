@@ -3,68 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>图片压缩工具</title>
+    <title>朋友圈海报生成器</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>图片压缩工具</h1>
-            <p>支持 PNG、JPG 格式图片压缩</p>
+            <h1>朋友圈海报生成器</h1>
+            <p>输入产品信息，一键生成营销文案</p>
         </header>
 
-        <main>
-            <div class="upload-section">
-                <div class="upload-area" id="uploadArea">
-                    <input type="file" id="imageInput" accept="image/png, image/jpeg" hidden>
-                    <div class="upload-content">
-                        <svg class="upload-icon" width="48" height="48" viewBox="0 0 24 24">
-                            <path d="M12 4L12 16M12 4L8 8M12 4L16 8M4 17L4 19C4 19.5523 4.44772 20 5 20L19 20C19.5523 20 20 19.5523 20 19L20 17" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                        <p>点击或拖拽图片到此处</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="comparison-section" id="comparisonSection" style="display: none;">
-                <div class="image-container">
-                    <h3>原始图片</h3>
-                    <div class="image-preview">
-                        <img id="originalImage" alt="原始图片">
-                    </div>
-                    <div class="image-info">
-                        <span>文件大小：</span>
-                        <span id="originalSize">0 KB</span>
-                    </div>
+        <main class="app-layout">
+            <section class="form-card">
+                <h2>填写商品信息</h2>
+                <div class="form-group">
+                    <label for="productName">产品名</label>
+                    <input id="productName" type="text" placeholder="如：轻养生花果茶" maxlength="30">
                 </div>
 
-                <div class="image-container">
-                    <h3>压缩后</h3>
-                    <div class="image-preview">
-                        <img id="compressedImage" alt="压缩后图片">
-                    </div>
-                    <div class="image-info">
-                        <span>文件大小：</span>
-                        <span id="compressedSize">0 KB</span>
-                    </div>
+                <div class="form-group">
+                    <label for="sellingPoints">卖点（可多条，使用顿号/逗号分隔）</label>
+                    <textarea id="sellingPoints" rows="4" placeholder="如：0蔗糖、真材实料、冷泡热泡都好喝"></textarea>
                 </div>
-            </div>
 
-            <div class="controls" id="controls" style="display: none;">
-                <div class="quality-control">
-                    <label for="quality">压缩质量：</label>
-                    <input type="range" id="quality" min="0" max="100" value="80">
-                    <span id="qualityValue">80%</span>
+                <div class="form-group">
+                    <label for="price">价格</label>
+                    <input id="price" type="text" placeholder="如：39.9元/盒">
                 </div>
-                <button id="downloadBtn" class="download-btn">下载压缩图片</button>
-            </div>
+
+                <button id="generateBtn" class="primary-btn">生成营销文案</button>
+            </section>
+
+            <section class="poster-card">
+                <h2>海报预览</h2>
+                <div class="poster" id="posterPreview">
+                    <div class="poster-tag">朋友圈推荐</div>
+                    <h3 id="posterProduct">你的产品名</h3>
+                    <p id="posterCopy">填写左侧信息后，点击“生成营销文案”，这里会自动生成一段可直接发朋友圈的营销文案。</p>
+                    <div class="poster-price" id="posterPrice">¥ --</div>
+                </div>
+                <div class="actions">
+                    <button id="copyBtn" class="secondary-btn">复制文案</button>
+                    <span id="copyFeedback" aria-live="polite"></span>
+                </div>
+            </section>
         </main>
 
         <footer class="footer">
-            <p>© 2024 图片压缩工具 | 作者: 黄培健</p>
-            <p>一个简单易用的在线图片压缩工具</p>
+            <p>© 2026 朋友圈海报生成器</p>
         </footer>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
